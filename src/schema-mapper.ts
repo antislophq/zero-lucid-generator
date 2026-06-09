@@ -35,6 +35,8 @@ export function toZeroRelationshipsName(modelName: string): string {
 // Column mapping
 // ----------------------------------------------------------------
 
+export { mapColumns, mapRelations }
+
 function mapColumns(
   model: LucidModel,
   columnTypeOverrides: Record<string, string> | undefined,
