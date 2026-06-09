@@ -113,7 +113,7 @@ function mapRelations(
 
     const relatedIncluded = allModels.some((m) => m.name === relatedModel.name)
     if (!relatedIncluded) {
-      console.warn(
+      console.info(
         `lucid-zero: Skipping relation "${relationName}" on ${model.name} — ${relatedModel.name} was not found in modelsSourcePath.`,
       )
       continue

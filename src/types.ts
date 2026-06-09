@@ -15,6 +15,14 @@ export type Config = {
   modelsSourcePath: string
 
   /**
+   * Models to exclude from the generated schema.
+   *
+   * @example
+   * excludeModels: [Session, UserIdentity]
+   */
+  excludeModels?: LucidModel[]
+
+  /**
    * Output file path. Defaults to ./zero-schema.gen.ts
    */
   output?: string

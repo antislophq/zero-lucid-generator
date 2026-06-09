@@ -60,6 +60,7 @@ import { schema, zql } from './zero-schema.gen.js'
 | `output` | `string` | `zero-schema.gen.ts` | Output file path |
 | `prettier` | `boolean` | `false` | Format the output with prettier (must be installed) |
 | `camelCase` | `boolean` | `false` | Convert `snake_case` DB table names to `camelCase` in the Zero schema |
+| `excludeModels` | `LucidModel[]` | — | Models to exclude from the generated schema |
 | `columnTypes` | `Record<string, Record<string, string>>` | — | Override the Zero type for specific columns (see below) |
 
 ---

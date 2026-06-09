@@ -9,6 +9,13 @@ export default lucidZeroConfig({
   modelsSourcePath: './app/models',
 
   /**
+   * Models to exclude from the generated schema.
+   * Useful for server-only models like Session that should never
+   * be synced to Zero clients.
+   */
+  excludeModels: [],
+
+  /**
    * Where to write the generated schema.
    * Defaults to zero-schema.gen.ts next to this config file.
    */

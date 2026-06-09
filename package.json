@@ -26,6 +26,9 @@
   "license": "ISC",
   "packageManager": "npm@11.12.1",
   "type": "module",
+  "peerDependencies": {
+    "@adonisjs/lucid": ">=21.0.0"
+  },
   "devDependencies": {
     "@adonisjs/lucid": "^22.4.2",
     "@types/node": "^25.9.2",

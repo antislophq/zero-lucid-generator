@@ -118,7 +118,11 @@ export async function loadConfigFile(configFilePath: string): Promise<ResolvedCo
   const configDir = path.dirname(absoluteConfigPath)
   const absoluteModelsPath = path.resolve(configDir, config.modelsSourcePath)
 
-  const models = await loadModelsFromDirectory(absoluteModelsPath)
+  const excludedNames = new Set((config.excludeModels ?? []).map((m) => m.name))
+
+  const models = (await loadModelsFromDirectory(absoluteModelsPath)).filter(
+    (m) => !excludedNames.has(m.name),
+  )
 
   if (models.length === 0) {
     throw new Error(
