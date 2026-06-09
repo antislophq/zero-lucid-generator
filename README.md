@@ -178,12 +178,17 @@ Relations pointing to a model not found in `modelsSourcePath` are skipped with a
 
 ---
 
-## Regenerating the schema
+### Automating regeneration
 
-Re-run the generator whenever you add or change a model:
+Add these scripts to your project's `package.json` to run the generator automatically after every `npm install`:
 
-```sh
-pnpm lucid-zero generate
+```json
+{
+  "scripts": {
+    "zero:generate": "lucid-zero generate",
+    "postinstall": "npm run zero:generate"
+  }
+}
 ```
 
-You can add this to your build or pre-commit step to keep the schema in sync.
+`postinstall` fires automatically after `npm install`. The `zero:generate` script lets you also trigger it manually whenever your models change.
