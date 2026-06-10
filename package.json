@@ -1,5 +1,5 @@
 {
-  "name": "lucid-zero",
+  "name": "@antislop/zero-lucid-generator",
   "version": "1.0.0",
   "description": "Generate Zero schemas from Lucid ORM models",
   "main": "./dist/index.js",
@@ -25,9 +25,12 @@
   "bin": {
     "lucid-zero": "./dist/index.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["zero", "lucid", "adonisjs", "schema", "generator", "rocicorp"],
+  "author": "antislop",
   "license": "ISC",
+  "publishConfig": {
+    "access": "public"
+  },
   "packageManager": "npm@11.12.1",
   "type": "module",
   "peerDependencies": {

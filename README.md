@@ -1,4 +1,4 @@
-# lucid-zero
+# @antislop/zero-lucid-generator
 
 Generate [Zero](https://zero.rocicorp.dev) schemas directly from your [Lucid ORM](https://lucid.adonisjs.com) models — no manual schema duplication.
 
@@ -8,17 +8,17 @@ Inspired by [`drizzle-zero`](https://github.com/rocicorp/drizzle-zero) and [`pri
 
 ## How it works
 
-`lucid-zero` scans your Lucid model files, introspects their column and relation definitions at runtime, infers TypeScript types via [ts-morph](https://ts-morph.com), and writes a typed Zero schema file you can import directly into your app.
+`@antislop/zero-lucid-generator` scans your Lucid model files, introspects their column and relation definitions at runtime, infers TypeScript types via [ts-morph](https://ts-morph.com), and writes a typed Zero schema file you can import directly into your app.
 
 ---
 
 ## Installation
 
 ```sh
-npm add -D lucid-zero
+npm add -D @antislop/zero-lucid-generator
 ```
 
-`lucid-zero` is a dev-time generator. You only need it during development to regenerate the schema when models change.
+`@antislop/zero-lucid-generator` is a dev-time generator. You only need it during development to regenerate the schema when models change.
 
 ---
 
@@ -29,7 +29,7 @@ npm add -D lucid-zero
 Create `lucid-zero.config.ts` at the root of your project:
 
 ```ts
-import type { Config } from 'lucid-zero'
+import type { Config } from '@antislop/zero-lucid-generator'
 
 const config: Config = {
   modelsSourcePath: './app/models',
@@ -80,7 +80,7 @@ Options:
 
 ## Column type inference
 
-`lucid-zero` maps TypeScript types to Zero types automatically:
+`@antislop/zero-lucid-generator` maps TypeScript types to Zero types automatically:
 
 | TypeScript type | Zero type |
 |---|---|
@@ -94,7 +94,7 @@ Options:
 When inference isn't accurate — for example a JSON column with a known shape — use `columnTypes`:
 
 ```ts
-import type { Config } from 'lucid-zero'
+import type { Config } from '@antislop/zero-lucid-generator'
 
 const config: Config = {
   modelsSourcePath: './app/models',
@@ -118,8 +118,6 @@ Valid Zero base types: `string`, `number`, `boolean`, `json`, `enumeration`.
 ---
 
 ## Example output
-
-Given a `User` model with a `hasMany` to `Post`, with `camelCase: true`:
 
 ```ts
 // zero-schema.gen.ts (auto-generated — do not edit)
@@ -167,10 +165,6 @@ export type Schema = typeof schema;
 
 export const zql = createBuilder(schema);
 ```
-
-`snake_case` DB names are always converted to `camelCase` in the generated schema, with `.from()` added when the names differ.
-
----
 
 ## Supported relation types
 

@@ -1,4 +1,4 @@
-import { Config } from 'lucid-zero'
+import { Config } from '@antislop/zero-lucid-generator'
 
 const lucidZeroConfig:Config = {
   /**
