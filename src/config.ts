@@ -14,7 +14,13 @@ export type CliOptions = {
 
 export type ConfigInput = {
   modelsSourcePath: string
-  excludeModels?: LucidModel[]
+  /**
+   * Models to exclude from the generated schema.
+   * Typed as a constructor array rather than `LucidModel[]` so that model
+   * classes from the user's own `@adonisjs/lucid` installation are accepted
+   * without a structural mismatch from duplicate copies of the package.
+   */
+  excludeModels?: (abstract new (...args: any[]) => any)[]
   output?: string
   prettier?: boolean
   columnTypes?: Record<string, Record<string, string>>
@@ -22,7 +28,7 @@ export type ConfigInput = {
 
 export class Config {
   modelsSourcePath: string
-  excludeModels: LucidModel[]
+  excludeModels: (abstract new (...args: any[]) => any)[]
   outputFilePath: string
   formatOutputFile: boolean
   columnTypes: Record<string, Record<string, string>>
