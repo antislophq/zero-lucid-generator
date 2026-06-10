@@ -5,6 +5,7 @@ export function toCamelCase(name: string): string {
   return name.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase())
 }
 
+
 export async function getDefaultExportFromModulePath(modulePath: string): Promise<unknown> {
   try {
     await fs.access(modulePath)

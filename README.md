@@ -61,7 +61,6 @@ import { schema, zql } from './zero-schema.gen.js'
 | `modelsSourcePath` | `string` | **required** | Path to your models directory, relative to the config file |
 | `output` | `string` | `zero-schema.gen.ts` | Output file path, relative to the config file |
 | `prettier` | `boolean` | `false` | Format the output with Prettier (must be installed) |
-| `camelCase` | `boolean` | `false` | Convert `snake_case` column/table names to `camelCase` in the Zero schema |
 | `excludeModels` | `LucidModel[]` | `[]` | Models to exclude from the generated schema |
 | `columnTypes` | `Record<string, Record<string, string>>` | `{}` | Override the inferred Zero type for specific columns |
 
@@ -169,7 +168,7 @@ export type Schema = typeof schema;
 export const zql = createBuilder(schema);
 ```
 
-With `camelCase: false` (the default), `snake_case` names are preserved as-is and no `.from()` is emitted.
+`snake_case` DB names are always converted to `camelCase` in the generated schema, with `.from()` added when the names differ.
 
 ---
 

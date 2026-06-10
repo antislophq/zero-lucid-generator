@@ -49,8 +49,8 @@ export default class CodeGenerator {
 
     for (const model of this.schema.models) {
       for (const col of Object.values(model.columns)) {
-        const base = col.type.match(/^([a-z]+)/)?.[1]
-        if (base) used.add(base)
+        const baseTypeName = col.type.match(/^([a-z]+)/)?.[1]
+        if (baseTypeName) used.add(baseTypeName)
       }
       if (Object.keys(model.relationships).length > 0) {
         used.add('relationships')
@@ -77,18 +77,16 @@ export default class CodeGenerator {
   }
 
   private toZeroName(name: string): string {
-    return this.config.camelCase ? toCamelCase(name) : name
+    return toCamelCase(name)
   }
 
   private relationshipVariableName(model: ZeroModel): string {
-    return this.config.camelCase
-      ? toCamelCase(model.tableName) + 'Relationships'
-      : model.tableName + '_relationships'
+    return toCamelCase(model.tableName) + 'Relationships'
   }
 
   private generateTableDefinitions(model: ZeroModel): string {
     const zeroName = this.toZeroName(model.tableName)
-    let out = `export const ${this.toZeroName(model.tableName)} = table("${zeroName}")`
+    let out = `export const ${zeroName} = table("${zeroName}")`
 
     if (zeroName !== model.tableName) {
       out += `\n  .from("${model.tableName}")`
@@ -107,39 +105,53 @@ export default class CodeGenerator {
   }
 
   private generateRelationshipsDefinitions(model: ZeroModel): string {
-    const entries = Object.entries(model.relationships)
-    if (entries.length === 0) return ''
+    const relationEntries = Object.entries(model.relationships)
+    if (relationEntries.length === 0) return ''
 
-    const hasOne = entries.some(([, r]) => r.type === 'one')
-    const hasMany = entries.some(([, r]) => r.type === 'many')
-    const imports = [hasOne && 'one', hasMany && 'many'].filter(Boolean).join(', ')
+    const hasOne = relationEntries.some(([, rel]) => rel.type === 'one')
+    const hasMany = relationEntries.some(([, rel]) => rel.type === 'many')
+    const destructured = [hasOne && 'one', hasMany && 'many'].filter(Boolean).join(', ')
 
-    const rels = entries
-      .map(([name, rel]) => `  ${name}: ${rel.type}(${this.generateRelationshipConfig(rel)})`)
+    const zeroName = this.toZeroName(model.tableName)
+    const body = relationEntries
+      .map(([name, rel]) => `  ${this.toZeroName(name)}: ${rel.type}(${this.generateRelationshipConfig(rel)})`)
       .join(',\n')
 
     return (
       `export const ${this.relationshipVariableName(model)} = ` +
-      `relationships(${this.toZeroName(model.tableName)}, ({ ${imports} }) => ({\n${rels}\n}));\n`
+      `relationships(${zeroName}, ({ ${destructured} }) => ({\n${body}\n}));\n`
     )
+  }
+
+  private zeroFields(fields: string[]): string {
+    return JSON.stringify(fields.map((f) => this.toZeroName(f)))
   }
 
   private generateRelationshipConfig(rel: ZeroRelationshipProperties): string {
     if ('chain' in rel) {
       return rel.chain
-        .map(
-          (link) =>
-            `{\n      sourceField: ${JSON.stringify(link.sourceField.map((f) => this.toZeroName(f)))},\n      destField: ${JSON.stringify(link.destinationField.map((f) => this.toZeroName(f)))},\n      destSchema: ${this.toZeroName(link.destinationTable)},\n    }`,
-        )
+        .map((link) => [
+          `{`,
+          `      sourceField: ${this.zeroFields(link.sourceField)},`,
+          `      destField: ${this.zeroFields(link.destinationField)},`,
+          `      destSchema: ${this.toZeroName(link.destinationTable)},`,
+          `    }`,
+        ].join('\n'))
         .join(', ')
     }
 
-    return `{\n    sourceField: ${JSON.stringify(rel.sourceField.map((f) => this.toZeroName(f)))},\n    destField: ${JSON.stringify(rel.destinationField.map((f) => this.toZeroName(f)))},\n    destSchema: ${this.toZeroName(rel.destinationTable)},\n  }`
+    return [
+      `{`,
+      `    sourceField: ${this.zeroFields(rel.sourceField)},`,
+      `    destField: ${this.zeroFields(rel.destinationField)},`,
+      `    destSchema: ${this.toZeroName(rel.destinationTable)},`,
+      `  }`,
+    ].join('\n')
   }
 
   private generateExports(): string {
     const hasRelationships = this.schema.models.some(
-      (m) => Object.keys(m.relationships).length > 0,
+      (model) => Object.keys(model.relationships).length > 0,
     )
 
     let out = `\nexport const schema = createSchema({\n`

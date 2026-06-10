@@ -28,12 +28,6 @@ const lucidZeroConfig:Config = {
   prettier: true,
 
   /**
-   * Convert snake_case DB table names to camelCase in the Zero schema.
-   * e.g. "issue_labels" → "issueLabels"
-   */
-  camelCase: true,
-
-  /**
    * Override the inferred Zero type for specific columns.
    *
    * Use this when ts-morph cannot see the correct type (e.g. an opaque

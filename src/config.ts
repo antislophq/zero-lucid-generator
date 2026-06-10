@@ -17,7 +17,6 @@ export type ConfigInput = {
   excludeModels?: LucidModel[]
   output?: string
   prettier?: boolean
-  camelCase?: boolean
   columnTypes?: Record<string, Record<string, string>>
 }
 
@@ -26,7 +25,6 @@ export class Config {
   excludeModels: LucidModel[]
   outputFilePath: string
   formatOutputFile: boolean
-  camelCase: boolean
   columnTypes: Record<string, Record<string, string>>
   tsconfigPath: string
   
@@ -43,7 +41,6 @@ export class Config {
     this.outputFilePath = path.resolve(configDir, configInput.output ?? DEFAULT_OUTPUT_FILE_PATH)
     this.tsconfigPath = tsconfigPath ?? path.resolve(configDir, 'tsconfig.json')
     this.formatOutputFile = configInput.prettier ?? false
-    this.camelCase = configInput.camelCase ?? false
     this.columnTypes = configInput.columnTypes ?? {}
   }
 
