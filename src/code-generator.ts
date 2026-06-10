@@ -103,7 +103,7 @@ export default class CodeGenerator {
     }
 
     out += '  })'
-    out += `\n  .primaryKey(${model.primaryKey.map((k) => `"${k}"`).join(', ')});\n`
+    out += `\n  .primaryKey(${model.primaryKey.map((k) => `"${this.toZeroName(k)}"`).join(', ')});\n`
 
     return out
   }

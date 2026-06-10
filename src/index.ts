@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { fileURLToPath } from 'node:url'
 import { Command } from 'commander'
 import { ConfigLoader, DEFAULT_CONFIG_FILE_PATH } from './config.js'
 import SchemaTransformer from './schema-transformer.js'
@@ -26,7 +27,9 @@ program
     await run(opts as CliOptions)
   })
 
-program.parse()
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  program.parse()
+}
 
 
 async function run(options: CliOptions) {

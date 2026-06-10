@@ -24,10 +24,14 @@ export class ResolvedConfig {
   camelCase: boolean
   columnTypes: Record<string, Record<string, string>>
 
+  /** Directory containing the config file — used to resolve relative paths */
+  private configDir: string
+
   /** Populated by this.loadModels() */
   models: LucidModel[] = []
 
-  constructor(configInput: Config) {
+  constructor(configInput: Config, configDir: string = process.cwd()) {
+    this.configDir = configDir
     this.modelsSourcePath = configInput.modelsSourcePath
     this.excludeModels = configInput.excludeModels ?? []
     this.outputFilePath = configInput.output ?? DEFAULT_OUTPUT_FILE_PATH
@@ -56,7 +60,7 @@ export class ResolvedConfig {
   }
 
   private async loadModels(): Promise<void> {
-    const modelsSourceAbsPath = path.resolve(process.cwd(), this.modelsSourcePath)
+    const modelsSourceAbsPath = path.resolve(this.configDir, this.modelsSourcePath)
 
     let fileNames: string[]
     try {
@@ -80,7 +84,8 @@ export class ResolvedConfig {
             path.join(modelsSourceAbsPath, fileName)
           )
         } catch (err) {
-          throw new Error(`Failed to import ${fileName}: ${String(err)}`)
+          console.warn(`lucid-zero: Failed to import ${fileName}, skipping: ${String(err)}`)
+          return null
         }
 
         if (!this.isLucidModel(defaultExport)) {
@@ -157,8 +162,9 @@ export class ConfigLoader {
       )
     }
 
-    // Build config from config input
-    const config = new ResolvedConfig(defaultExport as Config)
+    // Build config from config input, passing the config file's directory so
+    // relative paths (modelsSourcePath, output) resolve against it rather than CWD.
+    const config = new ResolvedConfig(defaultExport as Config, path.dirname(absoluteConfigPath))
 
     return config
   }

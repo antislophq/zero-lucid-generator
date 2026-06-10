@@ -269,7 +269,7 @@ export default class SchemaTransformer {
 
 export function isTsTypeOptional(type?: string): boolean {
   if (!type) {
-    return true
+    return false
   }
 
   return type.includes('null') || type.includes('undefined')
