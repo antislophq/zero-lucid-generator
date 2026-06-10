@@ -23,8 +23,8 @@ program
   .description('Generate a Zero schema from your Lucid models')
   .option('-c, --config <path>', `Path to config file (default: ${DEFAULT_CONFIG_FILE_PATH})`)
   .option('-t, --tsconfig <path>', `Path to tsconfig file (default: tsconfig.json)`)
-  .action(async (opts: CliOptions) => {
-    await run(opts as CliOptions)
+  .action(async (opts: { config?: string; tsconfig?: string }) => {
+    await run({ configFilePath: opts.config, tsconfigPath: opts.tsconfig })
   })
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

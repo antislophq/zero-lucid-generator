@@ -34,7 +34,7 @@ export class ResolvedConfig {
     this.configDir = configDir
     this.modelsSourcePath = configInput.modelsSourcePath
     this.excludeModels = configInput.excludeModels ?? []
-    this.outputFilePath = configInput.output ?? DEFAULT_OUTPUT_FILE_PATH
+    this.outputFilePath = path.resolve(configDir, configInput.output ?? DEFAULT_OUTPUT_FILE_PATH)
     this.formatOutputFile = configInput.prettier ?? false
     this.camelCase = configInput.camelCase ?? false
     this.columnTypes = configInput.columnTypes ?? {}

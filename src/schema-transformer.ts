@@ -100,7 +100,7 @@ export default class SchemaTransformer {
       for (const property of currentClass.getProperties()) {
         const attributeName = property.getName()
 
-        if (!model.$hasColumn(attributeName)) continue
+        if (!model.$columnsDefinitions.has(attributeName)) continue
         if (columnNameAndType.has(attributeName)) continue
 
         // Prefer the explicit annotation; fall back to compiler-inferred type
