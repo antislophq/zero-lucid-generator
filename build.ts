@@ -3,7 +3,6 @@ import { build } from 'tsup'
 await build({
   entry: {
     index: 'src/index.ts',
-    'cli/index': 'src/cli/index.ts',
   },
   format: ['esm'],
   target: 'node18',
