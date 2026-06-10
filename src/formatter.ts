@@ -1,11 +1,15 @@
 import { spawnSync } from 'node:child_process'
 import { createRequire } from 'node:module'
+import path from 'node:path'
 
 function resolveOxfmtBin(): string | null {
   try {
     const req = createRequire(process.cwd() + '/package.json')
     const pkgMain = req.resolve('oxfmt')
-    return pkgMain.replace(/dist\/index\.js$/, 'bin/oxfmt')
+    // pkgMain is <root>/node_modules/oxfmt/dist/index.js — walk up two levels
+    // to the package root, then into bin/oxfmt.
+    const pkgRoot = path.join(pkgMain, '..', '..')
+    return path.join(pkgRoot, 'bin', 'oxfmt')
   } catch {
     return null
   }
