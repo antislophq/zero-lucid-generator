@@ -1,6 +1,6 @@
-import { lucidZeroConfig } from 'lucid-zero'
+import { Config } from 'lucid-zero'
 
-export default lucidZeroConfig({
+const lucidZeroConfig:Config = {
   /**
    * Directory that contains your Lucid model files.
    * Every .ts file with a default export extending BaseModel is picked up.
@@ -28,12 +28,6 @@ export default lucidZeroConfig({
   prettier: true,
 
   /**
-   * Convert snake_case DB table names to camelCase in the Zero schema.
-   * e.g. "issue_labels" → "issueLabels"
-   */
-  camelCase: true,
-
-  /**
    * Override the inferred Zero type for specific columns.
    *
    * Use this when ts-morph cannot see the correct type (e.g. an opaque
@@ -51,4 +45,6 @@ export default lucidZeroConfig({
       role: 'enumeration<"admin" | "member" | "viewer">()',
     },
   },
-})
+}
+
+export default lucidZeroConfig;

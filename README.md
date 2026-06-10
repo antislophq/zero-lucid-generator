@@ -15,10 +15,10 @@ Inspired by [`drizzle-zero`](https://github.com/rocicorp/drizzle-zero) and [`pri
 ## Installation
 
 ```sh
-pnpm add lucid-zero
+npm add -D lucid-zero
 ```
 
-`lucid-zero` is a dev-time generator. You only need it in your project during development to regenerate the schema when models change.
+`lucid-zero` is a dev-time generator. You only need it during development to regenerate the schema when models change.
 
 ---
 
@@ -29,17 +29,19 @@ pnpm add lucid-zero
 Create `lucid-zero.config.ts` at the root of your project:
 
 ```ts
-import { lucidZeroConfig } from 'lucid-zero'
+import type { Config } from 'lucid-zero'
 
-export default lucidZeroConfig({
+const config: Config = {
   modelsSourcePath: './app/models',
-})
+}
+
+export default config
 ```
 
 ### 2. Run the generator
 
 ```sh
-pnpm lucid-zero generate
+npx lucid-zero generate
 ```
 
 This writes `zero-schema.gen.ts` next to your config file.
@@ -57,11 +59,10 @@ import { schema, zql } from './zero-schema.gen.js'
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `modelsSourcePath` | `string` | **required** | Path to your models directory, relative to the config file |
-| `output` | `string` | `zero-schema.gen.ts` | Output file path |
-| `prettier` | `boolean` | `false` | Format the output with prettier (must be installed) |
-| `camelCase` | `boolean` | `false` | Convert `snake_case` DB table names to `camelCase` in the Zero schema |
-| `excludeModels` | `LucidModel[]` | — | Models to exclude from the generated schema |
-| `columnTypes` | `Record<string, Record<string, string>>` | — | Override the Zero type for specific columns (see below) |
+| `output` | `string` | `zero-schema.gen.ts` | Output file path, relative to the config file |
+| `prettier` | `boolean` | `false` | Format the output with Prettier (must be installed) |
+| `excludeModels` | `LucidModel[]` | `[]` | Models to exclude from the generated schema |
+| `columnTypes` | `Record<string, Record<string, string>>` | `{}` | Override the inferred Zero type for specific columns |
 
 ---
 
@@ -71,17 +72,15 @@ import { schema, zql } from './zero-schema.gen.js'
 lucid-zero generate [options]
 
 Options:
-  -c, --config <path>     Path to config file          (default: lucid-zero.config.ts)
-  -o, --output <path>     Output file path             (default: zero-schema.gen.ts)
-  -t, --tsconfig <path>   Path to tsconfig.json        (default: ./tsconfig.json)
-  -f, --format            Format output with prettier
+  -c, --config <path>     Path to config file     (default: lucid-zero.config.ts)
+  -t, --tsconfig <path>   Path to tsconfig.json   (default: tsconfig.json next to config)
 ```
 
 ---
 
-## Column type overrides
+## Column type inference
 
-`lucid-zero` infers Zero types from your TypeScript annotations:
+`lucid-zero` maps TypeScript types to Zero types automatically:
 
 | TypeScript type | Zero type |
 |---|---|
@@ -90,21 +89,28 @@ Options:
 | `boolean` | `boolean()` |
 | `DateTime` / `Date` | `number()` (Unix ms) |
 | `object` / `unknown` / `any` | `json()` |
-| nullable (`\| null`) | `.optional()` |
+| `T \| null` or `T \| undefined` | `.optional()` |
 
 When inference isn't accurate — for example a JSON column with a known shape — use `columnTypes`:
 
 ```ts
-import { lucidZeroConfig } from 'lucid-zero'
+import type { Config } from 'lucid-zero'
 
-export default lucidZeroConfig({
+const config: Config = {
   modelsSourcePath: './app/models',
   columnTypes: {
     Issue: {
+      // metadata is typed as `unknown` but has a known shape
       metadata: 'json<{ priority: number; labels: string[] }>()',
     },
+    User: {
+      // role is stored as a string enum
+      role: 'enumeration<"admin" | "member" | "viewer">()',
+    },
   },
-})
+}
+
+export default config
 ```
 
 Valid Zero base types: `string`, `number`, `boolean`, `json`, `enumeration`.
@@ -113,7 +119,7 @@ Valid Zero base types: `string`, `number`, `boolean`, `json`, `enumeration`.
 
 ## Example output
 
-Given a `User` model with a `hasMany` relation to `Post`:
+Given a `User` model with a `hasMany` to `Post`, with `camelCase: true`:
 
 ```ts
 // zero-schema.gen.ts (auto-generated — do not edit)
@@ -127,7 +133,7 @@ import {
   table,
 } from "@rocicorp/zero";
 
-export const userTable = table("users")
+export const users = table("users")
   .columns({
     id: number(),
     name: string(),
@@ -135,32 +141,34 @@ export const userTable = table("users")
   })
   .primaryKey("id");
 
-export const postTable = table("posts")
+export const posts = table("posts")
   .columns({
     id: number(),
-    userId: number(),
+    userId: number().from('user_id'),
     title: string(),
     body: string().optional(),
   })
   .primaryKey("id");
 
-export const userTableRelationships = relationships(userTable, ({ many }) => ({
+export const usersRelationships = relationships(users, ({ many }) => ({
   posts: many({
     sourceField: ["id"],
     destField: ["userId"],
-    destSchema: postTable,
+    destSchema: posts,
   }),
 }));
 
 export const schema = createSchema({
-  tables: [userTable, postTable],
-  relationships: [userTableRelationships],
+  tables: [users, posts],
+  relationships: [usersRelationships],
 });
 
 export type Schema = typeof schema;
 
 export const zql = createBuilder(schema);
 ```
+
+`snake_case` DB names are always converted to `camelCase` in the generated schema, with `.from()` added when the names differ.
 
 ---
 
@@ -178,9 +186,9 @@ Relations pointing to a model not found in `modelsSourcePath` are skipped with a
 
 ---
 
-### Automating regeneration
+## Automating regeneration
 
-Add these scripts to your project's `package.json` to run the generator automatically after every `npm install`:
+Add a script to `package.json` to regenerate whenever models change:
 
 ```json
 {
@@ -190,5 +198,3 @@ Add these scripts to your project's `package.json` to run the generator automati
   }
 }
 ```
-
-`postinstall` fires automatically after `npm install`. The `zero:generate` script lets you also trigger it manually whenever your models change.
