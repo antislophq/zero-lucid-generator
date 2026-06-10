@@ -4,7 +4,7 @@ import { ResolvedConfig } from '../src/config.js'
 import type { TransformedSchema } from '../src/schema-transformer.js'
 
 function generateCode(schema: TransformedSchema, camelCase = false): string {
-  const config = new ResolvedConfig({ modelsSourcePath: '.', camelCase })
+  const config = new ResolvedConfig({ modelsSourcePath: '.', camelCase }, process.cwd(), 'tsconfig.json')
   const gen = new CodeGenerator(config, schema)
   return (gen as any).generate()
 }

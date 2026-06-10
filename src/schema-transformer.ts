@@ -147,6 +147,12 @@ export default class SchemaTransformer {
     )
   }
 
+  /** Translates a Lucid attribute name to its DB column name via $columnsDefinitions. */
+  private resolveColumnName(lucidModel: LucidModel, attributeName: string): string {
+    const entry = [...lucidModel.$columnsDefinitions].find(([attr]) => attr === attributeName)
+    return entry ? entry[1].columnName : attributeName
+  }
+
   private mapRelations(
     model: LucidModel,
     allModels: LucidModel[],
@@ -176,8 +182,8 @@ export default class SchemaTransformer {
         case 'hasOne':
           relationships[relationName] = {
             type: 'one',
-            sourceField: [relation.localKey],
-            destinationField: [relation.foreignKey],
+            sourceField: [this.resolveColumnName(model, relation.localKey)],
+            destinationField: [this.resolveColumnName(relatedModel, relation.foreignKey)],
             destinationTable: relatedModel.table,
           }
           break
@@ -185,8 +191,8 @@ export default class SchemaTransformer {
         case 'belongsTo':
           relationships[relationName] = {
             type: 'one',
-            sourceField: [relation.foreignKey],
-            destinationField: [relation.localKey],
+            sourceField: [this.resolveColumnName(model, relation.foreignKey)],
+            destinationField: [this.resolveColumnName(relatedModel, relation.localKey)],
             destinationTable: relatedModel.table,
           }
           break
@@ -194,8 +200,8 @@ export default class SchemaTransformer {
         case 'hasMany':
           relationships[relationName] = {
             type: 'many',
-            sourceField: [relation.localKey],
-            destinationField: [relation.foreignKey],
+            sourceField: [this.resolveColumnName(model, relation.localKey)],
+            destinationField: [this.resolveColumnName(relatedModel, relation.foreignKey)],
             destinationTable: relatedModel.table,
           }
           break
@@ -215,13 +221,14 @@ export default class SchemaTransformer {
             type: 'many',
             chain: [
               {
-                sourceField: [relation.localKey],
+                sourceField: [this.resolveColumnName(model, relation.localKey)],
+                // pivotForeignKey and pivotRelatedForeignKey are already DB column names
                 destinationField: [relation.pivotForeignKey],
                 destinationTable: relation.pivotTable
               },
               {
                 sourceField: [relation.pivotRelatedForeignKey],
-                destinationField: [relation.relatedKey ?? relatedModel.primaryKey],
+                destinationField: [this.resolveColumnName(relatedModel, relation.relatedKey ?? relatedModel.primaryKey)],
                 destinationTable: relatedModel.table,
               },
             ],
@@ -247,13 +254,13 @@ export default class SchemaTransformer {
             type: 'many',
             chain: [
               {
-                sourceField: [relation.localKey],
-                destinationField: [relation.foreignKey],
+                sourceField: [this.resolveColumnName(model, relation.localKey)],
+                destinationField: [this.resolveColumnName(throughModel, relation.foreignKey)],
                 destinationTable: throughModel.table,
               },
               {
-                sourceField: [throughRel.throughLocalKey ?? throughModel.primaryKey],
-                destinationField: [throughRel.throughForeignKey ?? relatedModel.primaryKey],
+                sourceField: [this.resolveColumnName(throughModel, throughRel.throughLocalKey ?? throughModel.primaryKey)],
+                destinationField: [this.resolveColumnName(relatedModel, throughRel.throughForeignKey ?? relatedModel.primaryKey)],
                 destinationTable: relatedModel.table,
               },
             ],

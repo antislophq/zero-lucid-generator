@@ -80,17 +80,15 @@ export default class CodeGenerator {
     return this.config.camelCase ? toCamelCase(name) : name
   }
 
-  private tableVar(model: ZeroModel): string {
-    return this.toZeroName(model.tableName) + 'Table'
-  }
-
-  private relationshipsVar(model: ZeroModel): string {
-    return this.toZeroName(model.tableName) + 'Relationships'
+  private relationshipVariableName(model: ZeroModel): string {
+    return this.config.camelCase
+      ? toCamelCase(model.tableName) + 'Relationships'
+      : model.tableName + '_relationships'
   }
 
   private generateTableDefinitions(model: ZeroModel): string {
     const zeroName = this.toZeroName(model.tableName)
-    let out = `export const ${this.tableVar(model)} = table("${zeroName}")`
+    let out = `export const ${this.toZeroName(model.tableName)} = table("${zeroName}")`
 
     if (zeroName !== model.tableName) {
       out += `\n  .from("${model.tableName}")`
@@ -121,8 +119,8 @@ export default class CodeGenerator {
       .join(',\n')
 
     return (
-      `export const ${this.relationshipsVar(model)} = ` +
-      `relationships(${this.tableVar(model)}, ({ ${imports} }) => ({\n${rels}\n}));\n`
+      `export const ${this.relationshipVariableName(model)} = ` +
+      `relationships(${this.toZeroName(model.tableName)}, ({ ${imports} }) => ({\n${rels}\n}));\n`
     )
   }
 
@@ -131,12 +129,12 @@ export default class CodeGenerator {
       return rel.chain
         .map(
           (link) =>
-            `{\n      sourceField: ${JSON.stringify(link.sourceField)},\n      destField: ${JSON.stringify(link.destinationField)},\n      destSchema: ${this.toZeroName(link.destinationTable)}Table,\n    }`,
+            `{\n      sourceField: ${JSON.stringify(link.sourceField.map((f) => this.toZeroName(f)))},\n      destField: ${JSON.stringify(link.destinationField.map((f) => this.toZeroName(f)))},\n      destSchema: ${this.toZeroName(link.destinationTable)},\n    }`,
         )
         .join(', ')
     }
 
-    return `{\n    sourceField: ${JSON.stringify(rel.sourceField)},\n    destField: ${JSON.stringify(rel.destinationField)},\n    destSchema: ${this.toZeroName(rel.destinationTable)}Table,\n  }`
+    return `{\n    sourceField: ${JSON.stringify(rel.sourceField.map((f) => this.toZeroName(f)))},\n    destField: ${JSON.stringify(rel.destinationField.map((f) => this.toZeroName(f)))},\n    destSchema: ${this.toZeroName(rel.destinationTable)},\n  }`
   }
 
   private generateExports(): string {
@@ -147,7 +145,7 @@ export default class CodeGenerator {
     let out = `\nexport const schema = createSchema({\n`
     out += `  tables: [\n`
     for (const model of this.schema.models) {
-      out += `    ${this.tableVar(model)},\n`
+      out += `    ${this.toZeroName(model.tableName)},\n`
     }
     out += `  ],\n`
 
@@ -155,7 +153,7 @@ export default class CodeGenerator {
       out += `  relationships: [\n`
       for (const model of this.schema.models) {
         if (Object.keys(model.relationships).length > 0) {
-          out += `    ${this.relationshipsVar(model)},\n`
+          out += `    ${this.relationshipVariableName(model)},\n`
         }
       }
       out += `  ],\n`

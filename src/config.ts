@@ -23,18 +23,20 @@ export class ResolvedConfig {
   formatOutputFile: boolean
   camelCase: boolean
   columnTypes: Record<string, Record<string, string>>
-
+  tsconfigPath: string
+  
   /** Directory containing the config file — used to resolve relative paths */
-  private configDir: string
+  configDir: string
 
   /** Populated by this.loadModels() */
   models: LucidModel[] = []
 
-  constructor(configInput: Config, configDir: string = process.cwd()) {
+  constructor(configInput: Config, configDir: string = process.cwd(), tsconfigPath?: string) {
     this.configDir = configDir
     this.modelsSourcePath = configInput.modelsSourcePath
     this.excludeModels = configInput.excludeModels ?? []
     this.outputFilePath = path.resolve(configDir, configInput.output ?? DEFAULT_OUTPUT_FILE_PATH)
+    this.tsconfigPath = tsconfigPath ?? path.resolve(configDir, 'tsconfig.json')
     this.formatOutputFile = configInput.prettier ?? false
     this.camelCase = configInput.camelCase ?? false
     this.columnTypes = configInput.columnTypes ?? {}
@@ -164,8 +166,7 @@ export class ConfigLoader {
 
     // Build config from config input, passing the config file's directory so
     // relative paths (modelsSourcePath, output) resolve against it rather than CWD.
-    const config = new ResolvedConfig(defaultExport as Config, path.dirname(absoluteConfigPath))
-
-    return config
+    const resolvedConfig = new ResolvedConfig(defaultExport as Config, path.dirname(absoluteConfigPath), opts.tsconfigPath)
+    return resolvedConfig
   }
 }

@@ -27,9 +27,8 @@ program
     await run({ configFilePath: opts.config, tsconfigPath: opts.tsconfig })
   })
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  program.parse()
-}
+// Run unconditionally; this is a script
+program.parse()
 
 
 async function run(options: CliOptions) {
