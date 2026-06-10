@@ -95,6 +95,7 @@ When inference isn't accurate â€” for example a JSON column with a known shape â
 
 ```ts
 import type { Config } from '@antislop/zero-lucid-generator'
+import Session from "#models/session";
 
 const config: Config = {
   modelsSourcePath: './app/models',
@@ -108,6 +109,7 @@ const config: Config = {
       role: 'enumeration<"admin" | "member" | "viewer">()',
     },
   },
+  excludeModels: [Session],
 }
 
 export default config
