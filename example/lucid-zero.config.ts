@@ -22,10 +22,10 @@ const lucidZeroConfig:Config = {
   output: './zero-schema.gen.ts',
 
   /**
-   * Format the output with prettier.
-   * Requires prettier to be installed in the project.
+   * Format the output with oxfmt.
+   * Requires oxfmt to be installed in the project.
    */
-  prettier: true,
+  format: true,
 
   /**
    * Override the inferred Zero type for specific columns.

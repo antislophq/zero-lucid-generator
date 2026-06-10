@@ -22,7 +22,8 @@ export type ConfigInput = {
    */
   excludeModels?: (abstract new (...args: any[]) => any)[]
   output?: string
-  prettier?: boolean
+  /** Format the output file with oxfmt. Requires oxfmt to be installed. */
+  format?: boolean
   columnTypes?: Record<string, Record<string, string>>
 }
 
@@ -46,13 +47,13 @@ export class Config {
     this.excludeModels = configInput.excludeModels ?? []
     this.outputFilePath = path.resolve(configDir, configInput.output ?? DEFAULT_OUTPUT_FILE_PATH)
     this.tsconfigPath = tsconfigPath ?? path.resolve(configDir, 'tsconfig.json')
-    this.formatOutputFile = configInput.prettier ?? false
+    this.formatOutputFile = configInput.format ?? false;
     this.columnTypes = configInput.columnTypes ?? {}
   }
 
   async verify(): Promise<void> {
     if (!this.modelsSourcePath) {
-      throw new Error('lucid-zero: modelsSourcePath is required')
+      throw new Error('modelsSourcePath is required')
     }
 
     // Load the models from the modelsSourcePath
@@ -60,7 +61,7 @@ export class Config {
 
     if (this.models.length === 0) {
       throw new Error(
-        `lucid-zero: No Lucid models found in modelsSourcePath. ` +
+        `No Lucid models found in modelsSourcePath. ` +
         `Each model file must have a default export that extends BaseModel.`,
       )
     }
@@ -77,7 +78,7 @@ export class Config {
       fileNames = await fs.readdir(modelsSourceAbsPath)
     } catch (e) {
       throw new Error(
-        `lucid-zero: Could not read modelsSourcePath at ${modelsSourceAbsPath}. Does the directory exist?`
+        `Could not read modelsSourcePath at ${modelsSourceAbsPath}. Does the directory exist?`
         + `Error: ${e}`,
       )
     }
@@ -94,7 +95,7 @@ export class Config {
             path.join(modelsSourceAbsPath, fileName)
           )
         } catch (err) {
-          console.warn(`lucid-zero: Failed to import ${fileName}, skipping: ${String(err)}`)
+          console.warn(`Failed to import ${fileName}, skipping: ${String(err)}`)
           return null
         }
 
@@ -124,7 +125,7 @@ export class Config {
       // Validates that the model name is one of the models loaded
       if (!modelNames.has(modelName)) {
         throw new Error(
-          `lucid-zero: columnTypes has unknown model "${modelName}". Known models: ${[...modelNames].join(', ')}`,
+          `columnTypes has unknown model "${modelName}". Known models: ${[...modelNames].join(', ')}`,
         )
       }
 
@@ -136,7 +137,7 @@ export class Config {
         const baseTypeName = typeString.match(/^([a-z]+)/)?.[1]
         if (!baseTypeName || !validZeroTypes.includes(baseTypeName)) {
           throw new Error(
-            `lucid-zero: columnTypes override for ${modelName}.${attributeName} has unrecognised type "${typeString}". Expected one of: ${validZeroTypes.join(', ')}`,
+            `columnTypes override for ${modelName}.${attributeName} has unrecognised type "${typeString}". Expected one of: ${validZeroTypes.join(', ')}`,
           )
         }
       }
@@ -167,8 +168,8 @@ export class ConfigLoader {
       defaultExport = await getDefaultExportFromModulePath(absoluteConfigPath)
     } catch (err) {
       throw new Error(
-        `lucid-zero: Failed to import config at ${absoluteConfigPath}\n` +
-        `  Error: ${String(err)}`,
+        `Failed to import config at ${absoluteConfigPath}\n` +
+        `  Error: ${err instanceof Error ? err.message : String(err)}`,
       )
     }
 

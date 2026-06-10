@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 import { fileURLToPath } from 'node:url'
 import { Command } from 'commander'
-import { ConfigLoader, DEFAULT_CONFIG_FILE_PATH } from './config.js'
-import type { CliOptions } from './config.js'
+import { CliOptions, ConfigLoader, DEFAULT_CONFIG_FILE_PATH } from './config.js'
 import SchemaTransformer from './schema-transformer.js'
 import CodeGenerator from './code-generator.js'
 

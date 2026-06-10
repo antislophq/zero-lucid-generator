@@ -60,9 +60,28 @@ import { schema, zql } from './zero-schema.gen.js'
 |---|---|---|---|
 | `modelsSourcePath` | `string` | **required** | Path to your models directory, relative to the config file |
 | `output` | `string` | `zero-schema.gen.ts` | Output file path, relative to the config file |
-| `prettier` | `boolean` | `false` | Format the output with Prettier (must be installed) |
+| `format` | `boolean` | `false` | Format the output with [oxfmt](https://oxc.rs/docs/guide/usage/formatter) (must be installed). Respects your `.oxfmtrc.json`. |
 | `excludeModels` | `LucidModel[]` | `[]` | Models to exclude from the generated schema |
 | `columnTypes` | `Record<string, Record<string, string>>` | `{}` | Override the inferred Zero type for specific columns |
+
+### Formatting with oxfmt
+
+Set `format: true` to have the generated file automatically formatted on every run:
+
+```ts
+const config: Config = {
+  modelsSourcePath: './app/models',
+  format: true,
+}
+```
+
+Install oxfmt in your project:
+
+```sh
+npm add -D oxfmt
+```
+
+The formatter picks up your `.oxfmtrc.json` / `oxfmt.config.ts` automatically, so the output will always match what your own format scripts produce.
 
 ---
 
