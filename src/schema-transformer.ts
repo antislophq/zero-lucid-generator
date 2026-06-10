@@ -1,5 +1,5 @@
 import type { LucidModel } from '@adonisjs/lucid/types/model'
-import type { Config } from './config.js'
+import type { ResolvedConfig } from './config.js'
 import type { ClassDeclaration } from 'ts-morph'
 import { Project } from 'ts-morph'
 
@@ -45,10 +45,10 @@ const typesToZeroTypes: Record<string, string> = {
 }
 
 export default class SchemaTransformer {
-  private config: Config
+  private config: ResolvedConfig
   private project: Project
 
-  constructor(config: Config, tsconfigPath?: string) {
+  constructor(config: ResolvedConfig, tsconfigPath?: string) {
     this.config = config
     this.project = new Project({ tsConfigFilePath: tsconfigPath ?? 'tsconfig.json' })
   }

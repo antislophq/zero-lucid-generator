@@ -50,4 +50,4 @@ async function run(options: CliOptions) {
 }
 
 
-export { ConfigInput } from './config.js'
+export { Config as ConfigInput } from './config.js'

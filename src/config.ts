@@ -7,7 +7,7 @@ import { getDefaultExportFromModulePath } from './utils.js'
 export const DEFAULT_CONFIG_FILE_PATH = 'lucid-zero.config.ts'
 export const DEFAULT_OUTPUT_FILE_PATH = 'zero-schema.gen.ts'
 
-export type ConfigInput = {
+export type Config = {
   modelsSourcePath: string
   excludeModels?: LucidModel[]
   output?: string
@@ -16,7 +16,7 @@ export type ConfigInput = {
   columnTypes?: Record<string, Record<string, string>>
 }
 
-export class Config {
+export class ResolvedConfig {
   modelsSourcePath: string
   excludeModels: LucidModel[]
   outputFilePath: string
@@ -27,7 +27,7 @@ export class Config {
   /** Populated by this.loadModels() */
   models: LucidModel[] = []
 
-  constructor(configInput: ConfigInput) {
+  constructor(configInput: Config) {
     this.modelsSourcePath = configInput.modelsSourcePath
     this.excludeModels = configInput.excludeModels ?? []
     this.outputFilePath = configInput.output ?? DEFAULT_OUTPUT_FILE_PATH
@@ -139,7 +139,7 @@ export class Config {
 }
 
 export class ConfigLoader {
-  public static async load(opts: CliOptions): Promise<Config> {
+  public static async load(opts: CliOptions): Promise<ResolvedConfig> {
     const absoluteConfigPath = path.resolve(
       process.cwd(),
       opts.configFilePath ?? DEFAULT_CONFIG_FILE_PATH
@@ -158,7 +158,7 @@ export class ConfigLoader {
     }
 
     // Build config from config input
-    const config = new Config(defaultExport as ConfigInput)
+    const config = new ResolvedConfig(defaultExport as Config)
 
     return config
   }

@@ -2,14 +2,14 @@ import { describe, expect, it, vi } from 'vitest'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import SchemaTransformer from '../src/schema-transformer.js'
-import { Config } from '../src/config.js'
+import { ResolvedConfig } from '../src/config.js'
 import { createMockModel } from './helpers.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const tsconfigPath = path.resolve(__dirname, '../tsconfig.json')
 
 function makeTransformer() {
-  const config = new Config({ modelsSourcePath: '.' })
+  const config = new ResolvedConfig({ modelsSourcePath: '.' })
   return new SchemaTransformer(config, tsconfigPath)
 }
 
