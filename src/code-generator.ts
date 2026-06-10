@@ -20,7 +20,7 @@ export default class CodeGenerator {
     let code = this.generate()
 
     if (this.config.formatOutputFile) {
-      code = await Formatter.format(code)
+      code = await Formatter.format(code, this.config.outputFilePath)
     }
 
     fs.writeFileSync(this.config.outputFilePath, code)

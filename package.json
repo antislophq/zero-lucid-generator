@@ -19,13 +19,20 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src tests",
     "lint:fix": "eslint src tests --fix",
-    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\""
+    "format": "oxfmt \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "oxfmt --check \"src/**/*.ts\" \"tests/**/*.ts\""
   },
   "bin": {
     "lucid-zero": "./dist/index.js"
   },
-  "keywords": ["zero", "lucid", "adonisjs", "schema", "generator", "rocicorp"],
+  "keywords": [
+    "zero",
+    "lucid",
+    "adonisjs",
+    "schema",
+    "generator",
+    "rocicorp"
+  ],
   "author": "antislop",
   "license": "ISC",
   "publishConfig": {
@@ -43,8 +50,7 @@
     "@typescript-eslint/parser": "^8.61.0",
     "@vitest/coverage-v8": "^4.1.8",
     "eslint": "^10.4.1",
-    "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.8.4",
+    "oxfmt": "^0.54.0",
     "tsup": "^8.5.1",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",

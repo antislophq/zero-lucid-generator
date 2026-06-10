@@ -80,7 +80,7 @@ export default class SchemaTransformer {
     // This is never hit; here just for defense
     if (!modelSourceFile) {
       throw new Error(
-        `lucid-zero: Could not find source file for model ${model.name} in ${this.project
+        `Could not find source file for model ${model.name} in ${this.project
           .getSourceFiles()
           .map((sourceFile) => sourceFile.getFilePath())
           .join(', ')}`,
@@ -90,7 +90,7 @@ export default class SchemaTransformer {
     const classDeclaration = modelSourceFile.getClass(model.name)
 
     if (!classDeclaration) {
-      throw new Error(`lucid-zero: Could not find class declaration for model ${model.name}`)
+      throw new Error(`Could not find class declaration for model ${model.name}`)
     }
 
     let currentClass: ClassDeclaration | undefined = classDeclaration
@@ -135,7 +135,7 @@ export default class SchemaTransformer {
           zeroType = tsTypeToZeroType(tsType)
         } else {
           console.warn(
-            `lucid-zero: Could not infer Zero type for ${model.name}.${attributeName}. Falling back to json(). Add a columnTypes override if this is wrong.`,
+            `Could not infer Zero type for ${model.name}.${attributeName}. Falling back to json(). Add a columnTypes override if this is wrong.`,
           )
           zeroType = 'json()'
         }
@@ -165,7 +165,7 @@ export default class SchemaTransformer {
         relation.boot()
       } catch (err) {
         throw new Error(
-          `lucid-zero: Failed to boot relation "${relationName}" on ${model.name}: ${String(err)}`,
+          `Failed to boot relation "${relationName}" on ${model.name}: ${String(err)}`,
         )
       }
 
@@ -173,7 +173,7 @@ export default class SchemaTransformer {
 
       if (!allModels.some((m) => m.name === relatedModel.name)) {
         console.info(
-          `lucid-zero: Skipping relation "${relationName}" on ${model.name} — ${relatedModel.name} is not included.`,
+          `Skipping relation "${relationName}" on ${model.name} — ${relatedModel.name} is not included.`,
         )
         continue
       }
@@ -213,7 +213,7 @@ export default class SchemaTransformer {
             !relation.pivotRelatedForeignKey
           ) {
             throw new Error(
-              `lucid-zero: manyToMany relation "${relationName}" on ${model.name} — pivot table fields could not be resolved after boot().`,
+              `manyToMany relation "${relationName}" on ${model.name} — pivot table fields could not be resolved after boot().`,
             )
           }
 
@@ -245,7 +245,7 @@ export default class SchemaTransformer {
 
           if (!throughRel.throughModel) {
             throw new Error(
-              `lucid-zero: hasManyThrough relation "${relationName}" on ${model.name} — throughModel could not be resolved after boot().`,
+              `hasManyThrough relation "${relationName}" on ${model.name} — throughModel could not be resolved after boot().`,
             )
           }
 

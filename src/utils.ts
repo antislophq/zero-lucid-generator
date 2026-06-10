@@ -10,7 +10,7 @@ export async function getDefaultExportFromModulePath(modulePath: string): Promis
   try {
     await fs.access(modulePath)
   } catch {
-    throw new Error(`lucid-zero: Module not found at ${modulePath}`)
+    throw new Error(`Module not found at ${modulePath}`)
   }
 
   const { tsImport } = await import('tsx/esm/api')
@@ -19,7 +19,7 @@ export async function getDefaultExportFromModulePath(modulePath: string): Promis
   const defaultExport = module.default
 
   if (!defaultExport) {
-    throw new Error(`lucid-zero: Module at ${modulePath} does not have a default export`)
+    throw new Error(`Module at ${modulePath} does not have a default export`)
   }
 
   return defaultExport
