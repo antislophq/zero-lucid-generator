@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import CodeGenerator from '../src/code-generator.js'
-import { ResolvedConfig } from '../src/config.js'
+import { Config } from '../src/config.js'
 import type { TransformedSchema } from '../src/schema-transformer.js'
 
 function generateCode(schema: TransformedSchema, camelCase = false): string {
-  const config = new ResolvedConfig({ modelsSourcePath: '.', camelCase }, process.cwd(), 'tsconfig.json')
+  const config = new Config({ modelsSourcePath: '.', camelCase }, process.cwd(), 'tsconfig.json')
   const gen = new CodeGenerator(config, schema)
   return (gen as any).generate()
 }
@@ -75,7 +75,7 @@ describe('generateCode', () => {
           },
         ],
       })
-      expect(generateCode(schema)).toContain('export const roomTable = table("room")')
+      expect(generateCode(schema)).toContain('export const room = table("room")')
     })
 
     it('adds .from() on the table when camelCase converts the table name', () => {
@@ -90,7 +90,7 @@ describe('generateCode', () => {
         ],
       })
       const code = generateCode(schema, true)
-      expect(code).toContain('export const userAccountsTable = table("userAccounts")')
+      expect(code).toContain('export const userAccounts = table("userAccounts")')
       expect(code).toContain('.from("user_accounts")')
     })
 
@@ -155,7 +155,7 @@ describe('generateCode', () => {
           },
         ],
       })
-      expect(generateCode(schema)).not.toContain('usersRelationships')
+      expect(generateCode(schema)).not.toContain('users_relationships')
     })
 
     it('emits a relationships constant for one-link relations', () => {
@@ -177,10 +177,10 @@ describe('generateCode', () => {
         ],
       })
       const code = generateCode(schema)
-      expect(code).toContain('postsRelationships')
+      expect(code).toContain('posts_relationships')
       expect(code).toContain('one(')
       expect(code).toContain('"author_id"')
-      expect(code).toContain('destSchema: usersTable')
+      expect(code).toContain('destSchema: users')
     })
 
     it('emits many() with chain for manyToMany relations', () => {
@@ -212,8 +212,8 @@ describe('generateCode', () => {
       })
       const code = generateCode(schema)
       expect(code).toContain('many(')
-      expect(code).toContain('post_tagsTable')
-      expect(code).toContain('tagsTable')
+      expect(code).toContain('post_tags')
+      expect(code).toContain('tags')
     })
   })
 
@@ -231,7 +231,7 @@ describe('generateCode', () => {
       })
       const code = generateCode(schema)
       expect(code).toContain('tables: [')
-      expect(code).toContain('usersTable,')
+      expect(code).toContain('users,')
     })
 
     it('omits relationships array when no relations exist', () => {
@@ -268,7 +268,7 @@ describe('generateCode', () => {
       })
       const code = generateCode(schema)
       expect(code).toContain('relationships: [')
-      expect(code).toContain('postsRelationships,')
+      expect(code).toContain('posts_relationships,')
     })
 
     it('exports Schema type and zql builder', () => {

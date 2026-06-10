@@ -1,6 +1,6 @@
-import { ConfigInput } from 'lucid-zero'
+import { Config } from 'lucid-zero'
 
-const config:ConfigInput = {
+const lucidZeroConfig:Config = {
   /**
    * Directory that contains your Lucid model files.
    * Every .ts file with a default export extending BaseModel is picked up.
@@ -52,3 +52,5 @@ const config:ConfigInput = {
     },
   },
 }
+
+export default lucidZeroConfig;

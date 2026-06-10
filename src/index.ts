@@ -2,6 +2,7 @@
 import { fileURLToPath } from 'node:url'
 import { Command } from 'commander'
 import { ConfigLoader, DEFAULT_CONFIG_FILE_PATH } from './config.js'
+import type { CliOptions } from './config.js'
 import SchemaTransformer from './schema-transformer.js'
 import CodeGenerator from './code-generator.js'
 
@@ -10,13 +11,6 @@ const program = new Command()
 program
   .name('lucid-zero')
   .description('Generate Zero schemas from Lucid ORM model definitions')
-
-
-// Specify a type for opts
-export type CliOptions = {
-  configFilePath?: string
-  tsconfigPath?: string
-}
 
 program
   .command('generate')
@@ -52,4 +46,4 @@ async function run(options: CliOptions) {
 }
 
 
-export { Config as ConfigInput } from './config.js'
+export { ConfigInput as Config } from './config.js'

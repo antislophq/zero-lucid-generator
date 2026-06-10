@@ -1,13 +1,18 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import type { LucidModel } from '@adonisjs/lucid/types/model'
-import type { CliOptions } from './index.js'
+
 import { getDefaultExportFromModulePath } from './utils.js'
 
 export const DEFAULT_CONFIG_FILE_PATH = 'lucid-zero.config.ts'
 export const DEFAULT_OUTPUT_FILE_PATH = 'zero-schema.gen.ts'
 
-export type Config = {
+export type CliOptions = {
+  configFilePath?: string
+  tsconfigPath?: string
+}
+
+export type ConfigInput = {
   modelsSourcePath: string
   excludeModels?: LucidModel[]
   output?: string
@@ -16,7 +21,7 @@ export type Config = {
   columnTypes?: Record<string, Record<string, string>>
 }
 
-export class ResolvedConfig {
+export class Config {
   modelsSourcePath: string
   excludeModels: LucidModel[]
   outputFilePath: string
@@ -31,7 +36,7 @@ export class ResolvedConfig {
   /** Populated by this.loadModels() */
   models: LucidModel[] = []
 
-  constructor(configInput: Config, configDir: string = process.cwd(), tsconfigPath?: string) {
+  constructor(configInput: ConfigInput, configDir: string = process.cwd(), tsconfigPath?: string) {
     this.configDir = configDir
     this.modelsSourcePath = configInput.modelsSourcePath
     this.excludeModels = configInput.excludeModels ?? []
@@ -146,7 +151,7 @@ export class ResolvedConfig {
 }
 
 export class ConfigLoader {
-  public static async load(opts: CliOptions): Promise<ResolvedConfig> {
+  public static async load(opts: CliOptions): Promise<Config> {
     const absoluteConfigPath = path.resolve(
       process.cwd(),
       opts.configFilePath ?? DEFAULT_CONFIG_FILE_PATH
@@ -166,7 +171,7 @@ export class ConfigLoader {
 
     // Build config from config input, passing the config file's directory so
     // relative paths (modelsSourcePath, output) resolve against it rather than CWD.
-    const resolvedConfig = new ResolvedConfig(defaultExport as Config, path.dirname(absoluteConfigPath), opts.tsconfigPath)
-    return resolvedConfig
+    const config = new Config(defaultExport as ConfigInput, path.dirname(absoluteConfigPath), opts.tsconfigPath)
+    return config
   }
 }

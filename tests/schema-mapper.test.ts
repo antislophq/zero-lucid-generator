@@ -2,14 +2,14 @@ import { describe, expect, it, vi } from 'vitest'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import SchemaTransformer from '../src/schema-transformer.js'
-import { ResolvedConfig } from '../src/config.js'
+import { Config } from '../src/config.js'
 import { createMockModel } from './helpers.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const tsconfigPath = path.resolve(__dirname, '../tsconfig.json')
 
 function makeTransformer() {
-  const config = new ResolvedConfig({ modelsSourcePath: '.' })
+  const config = new Config({ modelsSourcePath: '.' })
   return new SchemaTransformer(config, tsconfigPath)
 }
 
@@ -353,7 +353,7 @@ describe('mapRelations', () => {
     const result = (transformer as any).mapRelations(model, [model]) // postModel excluded
 
     expect(result.posts).toBeUndefined()
-    expect(info).toHaveBeenCalledWith(expect.stringContaining('Post was not found'))
+    expect(info).toHaveBeenCalledWith(expect.stringContaining('Post is not included'))
 
     info.mockRestore()
   })

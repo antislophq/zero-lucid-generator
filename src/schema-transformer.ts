@@ -1,5 +1,5 @@
 import type { LucidModel } from '@adonisjs/lucid/types/model'
-import type { ResolvedConfig } from './config.js'
+import type { Config } from './config.js'
 import type { ClassDeclaration } from 'ts-morph'
 import { Project } from 'ts-morph'
 
@@ -45,10 +45,10 @@ const typesToZeroTypes: Record<string, string> = {
 }
 
 export default class SchemaTransformer {
-  private config: ResolvedConfig
+  private config: Config
   private project: Project
 
-  constructor(config: ResolvedConfig, tsconfigPath?: string) {
+  constructor(config: Config, tsconfigPath?: string) {
     this.config = config
     this.project = new Project({ tsConfigFilePath: tsconfigPath ?? 'tsconfig.json' })
   }
@@ -173,7 +173,7 @@ export default class SchemaTransformer {
 
       if (!allModels.some((m) => m.name === relatedModel.name)) {
         console.info(
-          `lucid-zero: Skipping relation "${relationName}" on ${model.name} — ${relatedModel.name} was not found in modelsSourcePath.`,
+          `lucid-zero: Skipping relation "${relationName}" on ${model.name} — ${relatedModel.name} is not included.`,
         )
         continue
       }
