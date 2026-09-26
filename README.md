@@ -60,7 +60,6 @@ import { schema, zql } from './zero-schema.gen.js'
 |---|---|---|---|
 | `modelsSourcePath` | `string` | **required** | Path to your models directory, relative to the config file |
 | `output` | `string` | `zero-schema.gen.ts` | Output file path, relative to the config file |
-
 | `excludeModels` | `LucidModel[]` | `[]` | Models to exclude from the generated schema |
 | `columnTypes` | `Record<string, Record<string, string>>` | `{}` | Override the inferred Zero type for specific columns |
 
