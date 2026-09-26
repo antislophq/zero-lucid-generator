@@ -6,6 +6,7 @@ import { getDefaultExportFromModulePath } from './utils.js'
 
 export const DEFAULT_CONFIG_FILE_PATH = 'lucid-zero.config.ts'
 export const DEFAULT_OUTPUT_FILE_PATH = 'zero-schema.gen.ts'
+export const DEFAULT_MODELS_DIRECTORY = './app/models'
 
 export type CliOptions = {
   configFilePath?: string
@@ -13,7 +14,7 @@ export type CliOptions = {
 }
 
 export type ConfigInput = {
-  modelsSourcePath: string
+  modelsDirectory?: string
   /**
    * Models to exclude from the generated schema.
    * Typed as a constructor array rather than `LucidModel[]` so that model
@@ -21,17 +22,17 @@ export type ConfigInput = {
    * without a structural mismatch from duplicate copies of the package.
    */
   excludeModels?: (abstract new (...args: any[]) => any)[]
-  output?: string
+  outputPath?: string
 
-  columnTypes?: Record<string, Record<string, string>>
+  columnTypeOverrides?: Record<string, Record<string, string>>
 }
 
 export class Config {
-  modelsSourcePath: string
+  modelsDirectory: string
   excludeModels: (abstract new (...args: any[]) => any)[]
   outputFilePath: string
 
-  columnTypes: Record<string, Record<string, string>>
+  columnTypeOverrides: Record<string, Record<string, string>>
   tsconfigPath: string
   
   /** Directory containing the config file — used to resolve relative paths */
@@ -42,42 +43,42 @@ export class Config {
 
   constructor(configInput: ConfigInput, configDir: string = process.cwd(), tsconfigPath?: string) {
     this.configDir = configDir
-    this.modelsSourcePath = configInput.modelsSourcePath
+    this.modelsDirectory = configInput.modelsDirectory ?? DEFAULT_MODELS_DIRECTORY
     this.excludeModels = configInput.excludeModels ?? []
-    this.outputFilePath = path.resolve(configDir, configInput.output ?? DEFAULT_OUTPUT_FILE_PATH)
+    this.outputFilePath = path.resolve(configDir, configInput.outputPath ?? DEFAULT_OUTPUT_FILE_PATH)
     this.tsconfigPath = tsconfigPath ?? path.resolve(configDir, 'tsconfig.json')
 
-    this.columnTypes = configInput.columnTypes ?? {}
+    this.columnTypeOverrides = configInput.columnTypeOverrides ?? {}
   }
 
   async verify(): Promise<void> {
-    if (!this.modelsSourcePath) {
-      throw new Error('modelsSourcePath is required')
+    if (!this.modelsDirectory) {
+      throw new Error('modelsDirectory must not be empty')
     }
 
-    // Load the models from the modelsSourcePath
+    // Load the models from the modelsDirectory
     await this.loadModels()
 
     if (this.models.length === 0) {
       throw new Error(
-        `No Lucid models found in modelsSourcePath. ` +
+        `No Lucid models found in modelsDirectory. ` +
         `Each model file must have a default export that extends BaseModel.`,
       )
     }
 
-    // Validate columnTypes against the models
-    this.verifyColumnTypes()
+    // Validate columnTypeOverrides against the models
+    this.verifyColumnTypeOverrides()
   }
 
   private async loadModels(): Promise<void> {
-    const modelsSourceAbsPath = path.resolve(this.configDir, this.modelsSourcePath)
+    const modelsDirectoryAbsPath = path.resolve(this.configDir, this.modelsDirectory)
 
     let fileNames: string[]
     try {
-      fileNames = await fs.readdir(modelsSourceAbsPath)
+      fileNames = await fs.readdir(modelsDirectoryAbsPath)
     } catch (e) {
       throw new Error(
-        `Could not read modelsSourcePath at ${modelsSourceAbsPath}. Does the directory exist?`
+        `Could not read modelsDirectory at ${modelsDirectoryAbsPath}. Does the directory exist?`
         + `Error: ${e}`,
       )
     }
@@ -91,7 +92,7 @@ export class Config {
 
         try {
           defaultExport = await getDefaultExportFromModulePath(
-            path.join(modelsSourceAbsPath, fileName)
+            path.join(modelsDirectoryAbsPath, fileName)
           )
         } catch (err) {
           console.warn(`Failed to import ${fileName}, skipping: ${String(err)}`)
@@ -116,15 +117,15 @@ export class Config {
   }
 
 
-  private verifyColumnTypes(): void {
+  private verifyColumnTypeOverrides(): void {
     const validZeroTypes = ['string', 'number', 'boolean', 'json', 'enumeration']
     const modelNames = new Set(this.models.map((m) => m.name))
 
-    for (const [modelName, columnOverrides] of Object.entries(this.columnTypes ?? {})) {
+    for (const [modelName, columnOverrides] of Object.entries(this.columnTypeOverrides ?? {})) {
       // Validates that the model name is one of the models loaded
       if (!modelNames.has(modelName)) {
         throw new Error(
-          `columnTypes has unknown model "${modelName}". Known models: ${[...modelNames].join(', ')}`,
+          `columnTypeOverrides has unknown model "${modelName}". Known models: ${[...modelNames].join(', ')}`,
         )
       }
 
@@ -136,7 +137,7 @@ export class Config {
         const baseTypeName = typeString.match(/^([a-z]+)/)?.[1]
         if (!baseTypeName || !validZeroTypes.includes(baseTypeName)) {
           throw new Error(
-            `columnTypes override for ${modelName}.${attributeName} has unrecognised type "${typeString}". Expected one of: ${validZeroTypes.join(', ')}`,
+            `columnTypeOverrides override for ${modelName}.${attributeName} has unrecognised type "${typeString}". Expected one of: ${validZeroTypes.join(', ')}`,
           )
         }
       }
@@ -173,7 +174,7 @@ export class ConfigLoader {
     }
 
     // Build config from config input, passing the config file's directory so
-    // relative paths (modelsSourcePath, output) resolve against it rather than CWD.
+    // relative paths (modelsDirectory, outputPath) resolve against it rather than CWD.
     const config = new Config(defaultExport as ConfigInput, path.dirname(absoluteConfigPath), opts.tsconfigPath)
     return config
   }
