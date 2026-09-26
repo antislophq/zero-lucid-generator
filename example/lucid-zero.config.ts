@@ -21,11 +21,6 @@ const lucidZeroConfig:Config = {
    */
   output: './zero-schema.gen.ts',
 
-  /**
-   * Format the output with oxfmt.
-   * Requires oxfmt to be installed in the project.
-   */
-  format: true,
 
   /**
    * Override the inferred Zero type for specific columns.
