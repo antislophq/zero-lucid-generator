@@ -22,8 +22,7 @@ export type ConfigInput = {
    */
   excludeModels?: (abstract new (...args: any[]) => any)[]
   output?: string
-  /** Format the output file with oxfmt. Requires oxfmt to be installed. */
-  format?: boolean
+
   columnTypes?: Record<string, Record<string, string>>
 }
 
@@ -31,7 +30,7 @@ export class Config {
   modelsSourcePath: string
   excludeModels: (abstract new (...args: any[]) => any)[]
   outputFilePath: string
-  formatOutputFile: boolean
+
   columnTypes: Record<string, Record<string, string>>
   tsconfigPath: string
   
@@ -47,7 +46,7 @@ export class Config {
     this.excludeModels = configInput.excludeModels ?? []
     this.outputFilePath = path.resolve(configDir, configInput.output ?? DEFAULT_OUTPUT_FILE_PATH)
     this.tsconfigPath = tsconfigPath ?? path.resolve(configDir, 'tsconfig.json')
-    this.formatOutputFile = configInput.format ?? false;
+
     this.columnTypes = configInput.columnTypes ?? {}
   }
 

@@ -1,6 +1,6 @@
 import type { Config } from './config.js'
 import fs from 'node:fs'
-import { Formatter } from './formatter.js'
+
 import type { TransformedSchema, ZeroModel, ZeroRelationshipProperties, ZeroColumnProperties } from './schema-transformer.js'
 import { toCamelCase } from './utils.js'
 
@@ -17,11 +17,7 @@ export default class CodeGenerator {
   }
 
   async generateToOutputFile() {
-    let code = this.generate()
-
-    if (this.config.formatOutputFile) {
-      code = await Formatter.format(code, this.config.outputFilePath)
-    }
+    const code = this.generate()
 
     fs.writeFileSync(this.config.outputFilePath, code)
   }
