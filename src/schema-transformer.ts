@@ -57,7 +57,7 @@ export default class SchemaTransformer {
     return {
       models: this.config.models.map((model) => {
         const columnNameAndTypePairs = this.extractColumnNameAndType(model)
-        const columnOverrides = this.config.columnTypes?.[model.name]
+        const columnOverrides = this.config.columnTypeOverrides?.[model.name]
 
         return {
           tableName: model.table,
@@ -135,7 +135,7 @@ export default class SchemaTransformer {
           zeroType = tsTypeToZeroType(tsType)
         } else {
           console.warn(
-            `Could not infer Zero type for ${model.name}.${attributeName}. Falling back to json(). Add a columnTypes override if this is wrong.`,
+            `Could not infer Zero type for ${model.name}.${attributeName}. Falling back to json(). Add a columnTypeOverrides entry if this is wrong.`,
           )
           zeroType = 'json()'
         }

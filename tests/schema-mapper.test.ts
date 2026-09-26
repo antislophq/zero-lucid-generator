@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const tsconfigPath = path.resolve(__dirname, '../tsconfig.json')
 
 function makeTransformer() {
-  const config = new Config({ modelsSourcePath: '.' })
+  const config = new Config({ modelsDirectory: '.' })
   return new SchemaTransformer(config, tsconfigPath)
 }
 
@@ -100,7 +100,7 @@ describe('mapColumns', () => {
     expect(result.id?.isOptional).toBe(false)
   })
 
-  it('applies columnTypes override for Zero type', () => {
+  it('applies columnTypeOverrides override for Zero type', () => {
     const transformer = makeTransformer()
     const model = createMockModel({
       name: 'Issue',
@@ -119,7 +119,7 @@ describe('mapColumns', () => {
     expect(result.metadata?.type).toBe('json<{ priority: number }>()')
   })
 
-  it('infers optionality from source type even when columnTypes override is set', () => {
+  it('infers optionality from source type even when columnTypeOverrides override is set', () => {
     const transformer = makeTransformer()
     const model = createMockModel({
       name: 'UserIdentity',

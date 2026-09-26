@@ -32,7 +32,7 @@ Create `lucid-zero.config.ts` at the root of your project:
 import type { Config } from '@antislop/zero-lucid-generator'
 
 const config: Config = {
-  modelsSourcePath: './app/models',
+  modelsDirectory: './app/models', // Optional; this is the default
 }
 
 export default config
@@ -58,10 +58,10 @@ import { schema, zql } from './zero-schema.gen.js'
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `modelsSourcePath` | `string` | **required** | Path to your models directory, relative to the config file |
-| `output` | `string` | `zero-schema.gen.ts` | Output file path, relative to the config file |
+| `modelsDirectory` | `string` | `./app/models` | Path to your models directory, relative to the config file |
+| `outputPath` | `string` | `zero-schema.gen.ts` | Output file path, relative to the config file |
 | `excludeModels` | `LucidModel[]` | `[]` | Models to exclude from the generated schema |
-| `columnTypes` | `Record<string, Record<string, string>>` | `{}` | Override the inferred Zero type for specific columns |
+| `columnTypeOverrides` | `Record<string, Record<string, string>>` | `{}` | Override the inferred Zero type for specific columns |
 
 
 ---
@@ -91,15 +91,15 @@ Options:
 | `object` / `unknown` / `any` | `json()` |
 | `T \| null` or `T \| undefined` | `.optional()` |
 
-When inference isn't accurate — for example a JSON column with a known shape — use `columnTypes`:
+When inference isn't accurate — for example a JSON column with a known shape — use `columnTypeOverrides`:
 
 ```ts
 import type { Config } from '@antislop/zero-lucid-generator'
 import Session from "#models/session";
 
 const config: Config = {
-  modelsSourcePath: './app/models',
-  columnTypes: {
+  modelsDirectory: './app/models',
+  columnTypeOverrides: {
     Issue: {
       // metadata is typed as `unknown` but has a known shape
       metadata: 'json<{ priority: number; labels: string[] }>()',
@@ -178,7 +178,7 @@ export const zql = createBuilder(schema);
 | `manyToMany` | `many([...chain])` via pivot table |
 | `hasManyThrough` | `many([...chain])` |
 
-Relations pointing to a model not found in `modelsSourcePath` are skipped with a warning.
+Relations pointing to a model not found in `modelsDirectory` are skipped with a warning.
 
 ---
 

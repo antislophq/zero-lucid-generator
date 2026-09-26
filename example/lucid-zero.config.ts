@@ -4,9 +4,9 @@ const lucidZeroConfig:Config = {
   /**
    * Directory that contains your Lucid model files.
    * Every .ts file with a default export extending BaseModel is picked up.
-   * Path is relative to this config file.
+   * Path is relative to this config file. Defaults to ./app/models.
    */
-  modelsSourcePath: './app/models',
+  modelsDirectory: './app/models',
 
   /**
    * Models to exclude from the generated schema.
@@ -19,7 +19,7 @@ const lucidZeroConfig:Config = {
    * Where to write the generated schema.
    * Defaults to zero-schema.gen.ts next to this config file.
    */
-  output: './zero-schema.gen.ts',
+  outputPath: './zero-schema.gen.ts',
 
 
   /**
@@ -30,7 +30,7 @@ const lucidZeroConfig:Config = {
    *
    * Keys are model class names. Values map attribute name → Zero type string.
    */
-  columnTypes: {
+  columnTypeOverrides: {
     Issue: {
       // metadata is typed as `unknown` in the model but has a known shape
       metadata: 'json<{ priority: number; labels: string[] }>()',
