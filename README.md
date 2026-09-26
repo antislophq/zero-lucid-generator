@@ -26,7 +26,7 @@ npm add -D @antislop/zero-lucid-generator
 
 ### 1. Create a config file
 
-Create `lucid-zero.config.ts` at the root of your project:
+Create `config/lucid_zero.ts`:
 
 ```ts
 import type { Config } from '@antislop/zero-lucid-generator'
@@ -44,7 +44,7 @@ export default config
 npx lucid-zero generate
 ```
 
-This writes `zero-schema.gen.ts` next to your config file.
+Run this from your project root. This writes `zero-schema.gen.ts` in the current working directory.
 
 ### 3. Import the schema
 
@@ -56,13 +56,12 @@ import { schema, zql } from './zero-schema.gen.js'
 
 ## Config options
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `modelsDirectory` | `string` | `./app/models` | Path to your models directory, relative to the config file |
-| `outputPath` | `string` | `zero-schema.gen.ts` | Output file path, relative to the config file |
-| `excludeModels` | `LucidModel[]` | `[]` | Models to exclude from the generated schema |
-| `columnTypeOverrides` | `Record<string, Record<string, string>>` | `{}` | Override the inferred Zero type for specific columns |
-
+| Option                | Type                                     | Default              | Description                                                              |
+| --------------------- | ---------------------------------------- | -------------------- | ------------------------------------------------------------------------ |
+| `modelsDirectory`     | `string`                                 | `./app/models`       | Path to your models directory, relative to the current working directory |
+| `outputPath`          | `string`                                 | `zero-schema.gen.ts` | Output file path, relative to the current working directory              |
+| `excludeModels`       | `LucidModel[]`                           | `[]`                 | Models to exclude from the generated schema                              |
+| `columnTypeOverrides` | `Record<string, Record<string, string>>` | `{}`                 | Override the inferred Zero type for specific columns                     |
 
 ---
 
@@ -72,8 +71,8 @@ import { schema, zql } from './zero-schema.gen.js'
 lucid-zero generate [options]
 
 Options:
-  -c, --config <path>     Path to config file     (default: lucid-zero.config.ts)
-  -t, --tsconfig <path>   Path to tsconfig.json   (default: tsconfig.json next to config)
+  -c, --config <path>     Path to config file     (default: config/lucid_zero.ts)
+  -t, --tsconfig <path>   Path to tsconfig.json   (default: tsconfig.json in cwd)
 ```
 
 ---
@@ -82,20 +81,20 @@ Options:
 
 `@antislop/zero-lucid-generator` maps TypeScript types to Zero types automatically:
 
-| TypeScript type | Zero type |
-|---|---|
-| `string` | `string()` |
-| `number` | `number()` |
-| `boolean` | `boolean()` |
-| `DateTime` / `Date` | `number()` (Unix ms) |
-| `object` / `unknown` / `any` | `json()` |
-| `T \| null` or `T \| undefined` | `.optional()` |
+| TypeScript type                 | Zero type            |
+| ------------------------------- | -------------------- |
+| `string`                        | `string()`           |
+| `number`                        | `number()`           |
+| `boolean`                       | `boolean()`          |
+| `DateTime` / `Date`             | `number()` (Unix ms) |
+| `object` / `unknown` / `any`    | `json()`             |
+| `T \| null` or `T \| undefined` | `.optional()`        |
 
 When inference isn't accurate — for example a JSON column with a known shape — use `columnTypeOverrides`:
 
 ```ts
 import type { Config } from '@antislop/zero-lucid-generator'
-import Session from "#models/session";
+import Session from '#models/session'
 
 const config: Config = {
   modelsDirectory: './app/models',
@@ -124,59 +123,52 @@ Valid Zero base types: `string`, `number`, `boolean`, `json`, `enumeration`.
 ```ts
 // zero-schema.gen.ts (auto-generated — do not edit)
 
-import {
-  createBuilder,
-  createSchema,
-  number,
-  relationships,
-  string,
-  table,
-} from "@rocicorp/zero";
+import { createBuilder, createSchema, number, relationships, string, table } from '@rocicorp/zero'
 
-export const users = table("users")
+export const users = table('users')
   .columns({
     id: number(),
     name: string(),
     email: string(),
   })
-  .primaryKey("id");
+  .primaryKey('id')
 
-export const posts = table("posts")
+export const posts = table('posts')
   .columns({
     id: number(),
     userId: number().from('user_id'),
     title: string(),
     body: string().optional(),
   })
-  .primaryKey("id");
+  .primaryKey('id')
 
 export const usersRelationships = relationships(users, ({ many }) => ({
   posts: many({
-    sourceField: ["id"],
-    destField: ["userId"],
+    sourceField: ['id'],
+    destField: ['userId'],
     destSchema: posts,
   }),
-}));
+}))
 
 export const schema = createSchema({
   tables: [users, posts],
   relationships: [usersRelationships],
-});
+})
 
-export type Schema = typeof schema;
+export type Schema = typeof schema
 
-export const zql = createBuilder(schema);
+export const zql = createBuilder(schema)
 ```
 
 ## Supported relation types
 
-| Lucid relation | Zero mapping |
-|---|---|
-| `hasOne` | `one(...)` |
-| `hasMany` | `many(...)` |
-| `belongsTo` | `one(...)` |
-| `manyToMany` | `many([...chain])` via pivot table |
-| `hasManyThrough` | `many([...chain])` |
+| Lucid relation   | Zero mapping                       |
+| ---------------- | ---------------------------------- |
+| `hasOne`         | `one(...)`                         |
+| `hasMany`        | `many(...)`                        |
+| `belongsTo`      | `one(...)`                         |
+| `manyToMany`     | `many([...chain])` via pivot table |
+| `hasManyThrough` | `many([...chain])`                 |
 
 Relations pointing to a model not found in `modelsDirectory` are skipped with a warning.
 

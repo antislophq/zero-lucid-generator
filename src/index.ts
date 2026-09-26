@@ -30,7 +30,7 @@ async function run(options: CliOptions) {
     await config.verify()
 
     // Transform to an intermediate representation
-    const schemaTransformer = new SchemaTransformer(config, options.tsconfigPath)
+    const schemaTransformer = new SchemaTransformer(config)
     const transformedSchema = schemaTransformer.transform()
 
     // Generate the output file

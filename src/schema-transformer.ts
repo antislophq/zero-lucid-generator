@@ -50,7 +50,7 @@ export default class SchemaTransformer {
 
   constructor(config: Config, tsconfigPath?: string) {
     this.config = config
-    this.project = new Project({ tsConfigFilePath: tsconfigPath ?? 'tsconfig.json' })
+    this.project = new Project({ tsConfigFilePath: tsconfigPath ?? config.tsconfigPath })
   }
 
   public transform(): TransformedSchema {

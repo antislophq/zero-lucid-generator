@@ -4,7 +4,7 @@ import type { LucidModel } from '@adonisjs/lucid/types/model'
 
 import { getDefaultExportFromModulePath } from './utils.js'
 
-export const DEFAULT_CONFIG_FILE_PATH = 'lucid-zero.config.ts'
+export const DEFAULT_CONFIG_FILE_PATH = 'config/lucid_zero.ts'
 export const DEFAULT_OUTPUT_FILE_PATH = 'zero-schema.gen.ts'
 export const DEFAULT_MODELS_DIRECTORY = './app/models'
 
@@ -35,18 +35,18 @@ export class Config {
   columnTypeOverrides: Record<string, Record<string, string>>
   tsconfigPath: string
   
-  /** Directory containing the config file — used to resolve relative paths */
-  configDir: string
+  /** Working directory used to resolve relative paths */
+  cwd: string
 
   /** Populated by this.loadModels() */
   models: LucidModel[] = []
 
-  constructor(configInput: ConfigInput, configDir: string = process.cwd(), tsconfigPath?: string) {
-    this.configDir = configDir
+  constructor(configInput: ConfigInput, tsconfigPath?: string) {
+    this.cwd = process.cwd()
     this.modelsDirectory = configInput.modelsDirectory ?? DEFAULT_MODELS_DIRECTORY
     this.excludeModels = configInput.excludeModels ?? []
-    this.outputFilePath = path.resolve(configDir, configInput.outputPath ?? DEFAULT_OUTPUT_FILE_PATH)
-    this.tsconfigPath = tsconfigPath ?? path.resolve(configDir, 'tsconfig.json')
+    this.outputFilePath = path.resolve(this.cwd, configInput.outputPath ?? DEFAULT_OUTPUT_FILE_PATH)
+    this.tsconfigPath = path.resolve(this.cwd, tsconfigPath ?? 'tsconfig.json')
 
     this.columnTypeOverrides = configInput.columnTypeOverrides ?? {}
   }
@@ -71,7 +71,7 @@ export class Config {
   }
 
   private async loadModels(): Promise<void> {
-    const modelsDirectoryAbsPath = path.resolve(this.configDir, this.modelsDirectory)
+    const modelsDirectoryAbsPath = path.resolve(this.cwd, this.modelsDirectory)
 
     let fileNames: string[]
     try {
@@ -173,9 +173,7 @@ export class ConfigLoader {
       )
     }
 
-    // Build config from config input, passing the config file's directory so
-    // relative paths (modelsDirectory, outputPath) resolve against it rather than CWD.
-    const config = new Config(defaultExport as ConfigInput, path.dirname(absoluteConfigPath), opts.tsconfigPath)
+    const config = new Config(defaultExport as ConfigInput, opts.tsconfigPath)
     return config
   }
 }
